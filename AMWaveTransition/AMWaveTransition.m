@@ -126,12 +126,17 @@ const CGFloat MAX_DELAY = 0.15;
     // The gesture velocity will also determine the velocity of the cells
     float velocity = [gesture velocityInView:self.navigationController.view].x;
     CGPoint touch = [gesture locationInView:self.navigationController.view];
+    CGPoint fakeTouch;
+    BOOL staticTransition;
     if (index == 0) {
         //simple attach animation instead of crash
+        fakeTouch = touch;
         touch.x = 0;
         toVC = nil;
+        staticTransition = YES;
     } else {
        toVC = (UIViewController<AMWaveTransitioning> *)self.navigationController.viewControllers[index-1];
+        staticTransition = NO;
     }
     
     if (gesture.state == UIGestureRecognizerStateBegan) {
@@ -269,6 +274,11 @@ const CGFloat MAX_DELAY = 0.15;
             }];
         } else {
             // Abort
+            if (staticTransition && (fakeTouch.x - self.firstTouch.x ) > self.navigationController.view.frame.size.width * 0.6) {
+                if ([fromVC respondsToSelector:@selector(staticTransitionAction)]) {
+                    [fromVC staticTransitionAction];
+                }
+            }
             [UIView animateWithDuration:0.3 animations:^{
                 if ([fromVC respondsToSelector:@selector(visibleCells)] && [fromVC visibleCells].count > 0) {
                     [[fromVC visibleCells] enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, BOOL *stop) {
