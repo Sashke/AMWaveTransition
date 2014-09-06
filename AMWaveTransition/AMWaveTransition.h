@@ -10,6 +10,7 @@
 
 - (NSArray*)visibleCells;
 
+@optional
 /** Static transition action
  *
  * Fires when user slides out view with 0 index in navigationController.viewController
